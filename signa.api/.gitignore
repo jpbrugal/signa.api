@@ -2,6 +2,9 @@
 # Signa API (.NET 9) Gitignore
 # Environment: Visual Studio / VS Code / Rider / JetBrains
 ###########################################################
+# JetBrains / Rider IDE files
+.idea/
+*.DotSettings.user
 
 # Build artifacts
 bin/
