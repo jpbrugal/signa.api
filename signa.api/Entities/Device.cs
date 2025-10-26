@@ -1,7 +1,9 @@
-﻿using signa.api.Entities.Common;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using signa.api.Entities.Common;
 
 namespace Signa.Api.Entities;
 
+[Table("devices")]
 public class Device : SoftBase
 {
     public int Id { get; set; }
