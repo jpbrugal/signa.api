@@ -25,7 +25,7 @@ public class Device : SoftBase
     public DateTimeOffset? LastSeenAt { get; set; }
     
     [Column("is_active")]
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; } = false;
 
     // Navigation
     public ICollection<DeviceHeartbeat>? Heartbeats { get; set; }

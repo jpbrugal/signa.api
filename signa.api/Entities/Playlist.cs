@@ -16,7 +16,7 @@ public class Playlist : SoftBase
     public string? Description { get; set; }
     
     [Column("is_active")]
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; } = false;
 
     // FK
     [Column("created_by")]
