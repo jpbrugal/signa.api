@@ -1,11 +1,17 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Signa.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// DbContext (SQL Server)
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container
 builder.Services.AddControllers();
 
-// ✅ Add Swagger generator
+// Add Swagger generator
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -19,7 +25,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ✅ Enable Swagger UI only in development
+// Enable Swagger UI only in development
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
