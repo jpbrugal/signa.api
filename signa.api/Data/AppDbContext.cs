@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<DevicePlaylist> DevicePlaylists => Set<DevicePlaylist>();
     public DbSet<User> Users => Set<User>();
 
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -125,6 +126,20 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Email).IsUnique();
             entity.Property(e => e.IsActive).HasDefaultValue(false);
+        });
+        
+        // ========== REFRESH TOKENS ==========
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("refresh_tokens");
+            entity.HasKey(e => e.Id);
+
+            entity.HasIndex(e => e.Token).IsUnique();
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
