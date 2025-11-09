@@ -9,8 +9,8 @@ public class Device : SoftBase
     [Column("id")]
     public int Id { get; set; }
     
-    [Column("identifier")]
-    public string Identifier { get; set; } = null!;
+    [Column("serial_number")]
+    public string SerialNumber { get; set; } = null!;
     
     [Column("name")]
     public string? Name { get; set; }

@@ -22,13 +22,13 @@ public class AuthService : IAuthService
     }
 
     // ==========================================================
-    // 🧍 REGISTER
+    //  REGISTER
     // ==========================================================
     public async Task<ServiceResponse<UserResponseDto>> RegisterAsync(RegisterRequestDto dto)
     {
         // Check if user exists
         if (await _db.Users.AnyAsync(u => u.Email == dto.email))
-            return ServiceResponse<UserResponseDto>.Fail("El correo ya está registrado.");
+            return ServiceResponse<UserResponseDto>.Fail("Email is already registered.");
 
         var user = new User
         {
@@ -42,11 +42,11 @@ public class AuthService : IAuthService
         await _db.SaveChangesAsync();
 
         var userDto = new UserResponseDto(user.Id, user.Email, user.IsActive);
-        return ServiceResponse<UserResponseDto>.Ok(userDto, "Usuario registrado correctamente.");
+        return ServiceResponse<UserResponseDto>.Ok(userDto, "User registered successfully.");
     }
 
     // ==========================================================
-    // 🔐 LOGIN
+    // LOGIN
     // ==========================================================
     public async Task<ServiceResponse<AuthResponseDto>> LoginAsync(LoginRequestDto dto, string? ip)
     {
@@ -54,7 +54,7 @@ public class AuthService : IAuthService
             .FirstOrDefaultAsync(u => u.Email == dto.email && u.IsActive);
 
         if (user is null || !PasswordHasher.VerifyPassword(dto.password, user.PasswordHash))
-            return ServiceResponse<AuthResponseDto>.Fail("Correo o contraseña incorrectos.");
+            return ServiceResponse<AuthResponseDto>.Fail("Email or password is incorrect.");
 
         // Remove existing refresh tokens (1 per user)
         var oldTokens = _db.RefreshTokens.Where(t => t.UserId == user.Id);
@@ -87,27 +87,27 @@ public class AuthService : IAuthService
             expiresSeconds
         );
 
-        return ServiceResponse<AuthResponseDto>.Ok(response, "Inicio de sesión exitoso.");
+        return ServiceResponse<AuthResponseDto>.Ok(response, "Login successful.");
     }
 
     // ==========================================================
-    // ♻️ REFRESH TOKEN
+    //  REFRESH TOKEN
     // ==========================================================
     public async Task<ServiceResponse<AuthResponseDto>> RefreshAsync(RefreshRequestDto dto, string? ip)
     {
         var principal = _tokens.GetPrincipalFromExpiredToken(dto.access_token);
         if (principal == null)
-            return ServiceResponse<AuthResponseDto>.Fail("Token inválido o expirado.");
+            return ServiceResponse<AuthResponseDto>.Fail("Token invalid or expired.");
 
         var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
         if (!int.TryParse(userIdClaim, out var userId))
-            return ServiceResponse<AuthResponseDto>.Fail("Token inválido.");
+            return ServiceResponse<AuthResponseDto>.Fail("Invalid token.");
 
         var token = await _db.RefreshTokens
             .FirstOrDefaultAsync(t => t.Token == dto.refresh_token && t.UserId == userId);
 
         if (token is null || !token.IsActive)
-            return ServiceResponse<AuthResponseDto>.Fail("Refresh token inválido o expirado.");
+            return ServiceResponse<AuthResponseDto>.Fail("Refresh token invalid or expired.");
 
         // Replace the old refresh token
         _db.RefreshTokens.Remove(token);
@@ -130,21 +130,21 @@ public class AuthService : IAuthService
         var expiresSeconds = (int)TimeSpan.FromMinutes(15).TotalSeconds;
         var response = new AuthResponseDto(user.Id, user.Email, newAccess, newRefreshValue, "Bearer", expiresSeconds);
 
-        return ServiceResponse<AuthResponseDto>.Ok(response, "Token renovado correctamente.");
+        return ServiceResponse<AuthResponseDto>.Ok(response, "Token refreshed successfully.");
     }
 
     // ==========================================================
-    // 🚫 REVOKE TOKEN
+    //  REVOKE TOKEN
     // ==========================================================
     public async Task<ServiceResponse<bool>> RevokeAsync(string refreshToken, string? ip)
     {
         var token = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshToken);
         if (token is null || !token.IsActive)
-            return ServiceResponse<bool>.Fail("Refresh token no encontrado o ya expirado.");
+            return ServiceResponse<bool>.Fail("Refresh token not found or expired.");
 
         _db.RefreshTokens.Remove(token);
         await _db.SaveChangesAsync();
 
-        return ServiceResponse<bool>.Ok(true, "Token revocado correctamente.");
+        return ServiceResponse<bool>.Ok(true, "Token revoked successfully.");
     }
 }

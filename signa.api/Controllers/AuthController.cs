@@ -6,7 +6,7 @@ using signa.api.Services.Auth;
 namespace signa.api.Controllers;
 
 [ApiController]
-[Route("auth")]
+[Route("/auth")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _auth;

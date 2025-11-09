@@ -33,7 +33,7 @@ public class AppDbContext : DbContext
             entity.ToTable("devices");
 
             entity.HasKey(e => e.Id);
-            entity.HasIndex(e => e.Identifier).IsUnique();
+            entity.HasIndex(e => e.SerialNumber).IsUnique();
 
             entity.Property(e => e.Status).HasDefaultValue("offline");
             entity.Property(e => e.IsActive).HasDefaultValue(true);

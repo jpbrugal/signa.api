@@ -6,6 +6,8 @@ using Microsoft.OpenApi.Models;
 using Signa.Api.Data;
 using signa.api.Helpers.Token;
 using signa.api.Services.Auth;
+using signa.api.Services.Devices;
+using signa.api.Services.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,8 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDeviceService, DeviceService>();
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -85,6 +89,18 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyPolicy", policy =>
+    {
+        policy
+            .AllowAnyOrigin()     
+            .AllowAnyMethod()
+            .AllowAnyHeader();    
+    });
+});
+
+
 var app = builder.Build();
 
 // Enable Swagger UI only in development
@@ -99,6 +115,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("MyPolicy");
 
 app.UseAuthentication();
 
